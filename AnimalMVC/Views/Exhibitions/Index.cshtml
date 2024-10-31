@@ -1,0 +1,76 @@
+﻿@model IEnumerable<AnimalMVC.Models.Exhibition>
+
+@{
+    ViewData["Title"] = "Виставки";
+}
+
+<h1>Виставки</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Додати нову</a>
+</p>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">@Html.DisplayFor(modelItem => item.Name)</h5>
+                    <p class="card-text">
+                        <strong>Локація:</strong> @Html.DisplayFor(modelItem => item.Location)<br />
+                        <strong>Дата проведення:</strong> @Html.DisplayFor(modelItem => item.Date)<br />
+                        <strong>Статус:</strong> @(item.IsClosed ? "Проведено" : "Не проведено")<br />
+                        <strong>Опис:</strong> @Html.DisplayFor(modelItem => item.Description)
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Редагувати</a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Детальніше</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Видалити</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<h2>Фільтрувати виставки</h2>
+<label><input type="checkbox" id="showClosed"> Показати проведені</label>
+
+<div id="map" style="width: 100%; height: 500px;"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const map = L.map('map').setView([50.3886, 30.4912], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        const showClosedCheckbox = document.getElementById('showClosed');
+        let markers = [];
+
+        function loadExhibitions() {
+            fetch('/Exhibitions/GetExhibitions')
+                .then(response => response.json())
+                .then(data => {
+                    markers.forEach(marker => map.removeLayer(marker));
+                    markers = [];
+
+                    data.forEach(exhibition => {
+                        if (!showClosedCheckbox.checked && exhibition.isClosed) return;
+
+                        const marker = L.marker(exhibition.coordinates).addTo(map)
+                            .bindPopup(`<b>${exhibition.name}</b><br>${exhibition.location}<br>${new Date(exhibition.date).toLocaleString()}`);
+                        markers.push(marker);
+                    });
+                });
+        }
+
+        showClosedCheckbox.addEventListener('change', loadExhibitions);
+        loadExhibitions();
+    });
+</script>
+

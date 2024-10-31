@@ -1,0 +1,101 @@
+﻿@model IEnumerable<AnimalMVC.Models.AnimalExhibition>
+
+@{
+    ViewData["Title"] = "Тварини і виставки";
+}
+
+<h1>Тварини і виставки</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Додати нову</a>
+</p>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Тварина</th>
+            <th>Виставка</th>
+            <th>@Html.DisplayNameFor(model => model.RegistrationDate)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Animal.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Exhibition.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.RegistrationDate)</td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { animalId = item.AnimalId, exhibitionId = item.ExhibitionId }) |
+                    @Html.ActionLink("Details", "Details", new { animalId = item.AnimalId, exhibitionId = item.ExhibitionId }) |
+                    @Html.ActionLink("Delete", "Delete", new { animalId = item.AnimalId, exhibitionId = item.ExhibitionId })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <canvas id="animalExhibitionChart" width="200" height="50"></canvas>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/AnimalExhibitions/GetExhibitionAnimalCounts')
+            .then(response => response.json())
+            .then(data => {
+                if (data.length === 0) {
+                    console.error('No data available to display on the chart.');
+                    return;
+                }
+
+                const exhibitionNames = data.map(item => item.exhibitionName);
+                const animalCounts = data.map(item => item.animalCount);
+
+                const ctx = document.getElementById('animalExhibitionChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: exhibitionNames,
+                        datasets: [{
+                            label: 'Кількість тварин',
+                            data: animalCounts,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            hoverBackgroundColor: 'rgba(100, 149, 237, 0.7)',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Кількість тварин'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Назва виставки'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    });
+</script>

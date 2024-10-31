@@ -1,0 +1,41 @@
+﻿@model IEnumerable<AnimalMVC.Models.Animal>
+
+@{
+    ViewData["Title"] = "Тварини";
+}
+
+<h1>Тварини</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Додати нову</a>
+</p>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card" style="width: 100%; border: 1px solid #ddd;">
+                @if (item.Image != null && item.Image.Length > 0)
+                {
+                    <img src="@Url.Action("GetImage", "Animals", new { id = item.Id })" class="card-img-top" alt="Фото тварини" style="height: 300px; object-fit: cover;" />
+                }
+                else
+                {
+                    <img src="default-image.jpg" class="card-img-top" alt="Немає зображення" style="height: 200px; object-fit: cover;" />
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@item.Name</h5>
+                    <p class="card-text"><strong>Вид:</strong> @item.Species.Name</p>
+                    <p class="card-text"><strong>Порода:</strong> @item.Breed</p>
+                    <p class="card-text"><strong>Вік:</strong> @item.Age</p>
+                    <p class="card-text"><strong>Власник:</strong> @item.Owner.FullName</p>
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Редагувати</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Деталі</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Видалити</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

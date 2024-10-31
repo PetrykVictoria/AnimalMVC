@@ -1,0 +1,78 @@
+﻿
+@model AnimalMVC.Models.Exhibition
+
+@{
+    ViewData["Title"] = "Exhibition Details";
+}
+
+<div class="container-fluid">
+    <section class="jumbotron text-center bg-light py-5" style="background-image: url('/images/Firefly-drawing.jpg'); background-size: cover; background-position: center;">
+        <div class="container text-white" style="background-color: rgba(0, 0, 0, 0.5); padding: 20px; border-radius: 10px;">
+            <h1 class="display-4">@Model.Name</h1>
+            <p class="lead">@Model.Description</p>
+            <p style="font-size: 1.2rem;">
+                <strong>Дата та час:</strong> @Model.Date.ToString("dd.MM.yyyy HH:mm") | <strong>Місце:</strong> @Model.Location
+            </p>
+            <p>
+                <span class="badge badge-@((Model.IsClosed) ? "danger" : "success")">
+                    @(Model.IsClosed ? "Проведена" : "Не проведено")
+                </span>
+            </p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2 class="text-center my-4">Тварини-учасники виставки</h2>
+        <div class="row">
+            @if (Model.AnimalExhibitions != null && Model.AnimalExhibitions.Any())
+            {
+                @foreach (var animalExhibition in Model.AnimalExhibitions)
+                {
+                    var animal = animalExhibition.Animal;
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm h-100" style="border-radius: 10px;">
+                            @if (animal.Image != null && animal.Image.Length > 0)
+                            {
+                                <img src="@Url.Action("GetImage", "Animals", new { id = animal.Id })" class="card-img-top" alt="Фото тварини" style="height: 250px; object-fit: cover; border-top-left-radius: 10px; border-top-right-radius: 10px;" />
+                            }
+                            else
+                            {
+                                <img src="default-image.png" class="card-img-top" alt="Немає зображення" style="height: 250px; object-fit: cover; border-top-left-radius: 10px; border-top-right-radius: 10px;" />
+                            }
+                            <div class="card-body">
+                                <h5 class="card-title">@animal.Name</h5>
+                                <p class="card-text">Вік: @animal.Age років</p>
+                                <p class="card-text">Порода: @animal.Breed</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-muted text-center">Немає тварин, зареєстрованих на цю виставку.</p>
+            }
+        </div>
+    </section>
+
+    <div class="container my-5">
+        <h2 class="text-center my-4" style="font-weight: 600; font-size: 2rem;">Де ми знаходимось?</h2>
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-4">
+                <div class="map-container shadow-lg" style="border-radius: 15px; overflow: hidden;">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2543.816000421285!2d30.490265599999997!3d50.388628499999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40d4c8c38f584d57%3A0xe234b97d8c374f04!2z0LLRg9C70LjRhtGPINCX0L7RlyDQkdGD0YLQtdC90LrQviwgNiwg0JrQuNGX0LIsIDAyMDAw!5e0!3m2!1suk!2sua!4v1730245863553!5m2!1suk!2sua" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-card p-4 shadow-lg" style="background-color: #f9f9f9; border-radius: 15px;">
+                    <p><strong>Адреса:</strong> @Model.Location</p>
+                    <p><strong>Дата та час:</strong> @Model.Date.ToString("dd.MM.yyyy HH:mm")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aside class="fixed-bottom bg-dark text-white p-3 text-center">
+        <p>Контактні дані: +380000000000 | Email: exhibition@exhibition.com</p>
+    </aside>
+</div>
